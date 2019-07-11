@@ -4,23 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="css/main.css">
   <title>Adalab practise test 5</title>
 </head>
 <body>
   <header class="header">
-    <div class="wrapper">
-      <h2 class="header__subtitle">Ingredients</h2>
-      <h1 class="header__title">Risotto</h1>
-      <button class="btn__select-all" type="button">Select all</button>
-      <button class="btn__select-none" type="button">Deselect all</button>
+    <div class="wrapper container">
+      <div class="header__text">
+        <p class="header__subtitle">Ingredients</p>
+        <h1 class="header__title">Risotto</h1>
+      </div>
+      <button class="btn btn-link btn__select-all" type="button">Select all</button>
+      <button class="btn btn-link btn__select-none" type="button">Deselect all</button>
     </div>
   </header>
-  <section class="ingredients">
+  <section class="ingredients container">
     <ul class="ingredients__list">
-      <li class="ingredients__list__item">
+      <li class="ingredients__list__item list-group-item">
         <input class="ingredient__select" type="checkbox" name="" id=""/>
-        <input class="ingredient__quantity" type="text" value=1 />
+        <input class="ingredient__quantity" type="number" value=1 />
         <div class="ingredient__info">
           <h3 class="ingredient__name">Rice</h3>
           <p class="ingredient__brand">Uncle Ben's</p>
@@ -30,7 +33,7 @@
       </li>
     </ul>
   </section>
-  <section class="chosen__ingredients">
+  <section class="chosen__ingredients container">
     <p class="chosen__number">Items: 1</p>
     <div class="subtotal__container">
       <h3 class="subtotal__text">Subtotal</h3>
@@ -44,7 +47,7 @@
       <h3 class="total__text">Total</h3>
       <p class="total__cost">€</p>
     </div>
-    <button class="btn_purchase" type="button">Buy ingredients now: €</button>
+    <button class="btn btn-primary btn__purchase" type="button">Buy ingredients now: €</button>
   </section>
   <script src="js/main.js"></script>
 </body>
