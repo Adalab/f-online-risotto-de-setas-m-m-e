@@ -5,6 +5,9 @@ const title = document.querySelector('.header__title');
 const list = document.querySelector('.ingredients__list');
 const ingredientCost = document.querySelector('.ingredient__cost');
 const chosenNumber = document.querySelector('.chosen__number');
+const subtotalContainer = document.querySelector('.subtotal__cost');
+const deliveryCost = document.querySelector('.delivery__costs__cost');
+const totalCost = document.querySelector('.total__cost');
 
 let recipeData;
 let subtotal = 0;
@@ -52,21 +55,46 @@ const updateCost = (event, quantity) => {
   }
 };
 
-const updateChosenNumber = () => {
-  chosenNumber.innerHTML = `Items: ${chosenItems.length}`;
+const updateSubtotal = (cost, checked) => {
+  if (checked === true) {
+    subtotal += cost;
+  } else {
+    subtotal -= cost;
+  }
+  subtotalContainer.innerHTML = `${subtotal.toFixed(2)} €`;
+  return subtotal.toFixed(2);
+};
+
+
+const updateChosenNumber = (newNumber, checked) => {
+  if (checked ===true) {
+    totalItems += newNumber;
+    chosenNumber.innerHTML = `Items: ${totalItems}`;
+  } else {
+    totalItems -= newNumber;
+    chosenNumber.innerHTML = `Items: ${totalItems}`;
+  }
 };
 
 const handleCheckbox = event => {
   const checked = event.currentTarget.checked;
   const parent = findParent(event);
   const ingredient = findIngredient(parent);
+  const numberOfItem = parent.querySelector('.ingredient__quantity');
+  const intOfItem = parseInt(numberOfItem.value);
+  const costOfItem = parent.querySelector('.ingredient__cost');
+  const intCostOfItem = parseFloat(costOfItem.innerHTML);
+
   if (checked === true){
-    chosenItems.push(ingredient[0]);
+    const newIngredient = {...ingredient[0], number: intOfItem};
+    chosenItems.push(newIngredient);
+    updateChosenNumber(newIngredient.number, checked);
   } else {
     const key = chosenItems.findIndex(item => item.product === ingredient[0].product);
-    chosenItems.splice(key, 1);
+    const removedItem = chosenItems.splice(key, 1);
+    updateChosenNumber(removedItem[0].number, checked);
   }
-  updateChosenNumber();
+  updateSubtotal(intCostOfItem, checked);
   return chosenItems;
 };
 
@@ -96,7 +124,7 @@ const printIngredients = data => {
 
       const newBrand = document.createElement('p');
       newBrand.classList.add('ingredient__brand');
-      const newBrandContent = document.createTextNode(item.brand);
+      const newBrandContent = document.createTextNode(item.brand || '');
 
       const newWeight = document.createElement('p');
       newWeight.classList.add('ingredient__weight');
@@ -139,9 +167,7 @@ const fetchData = () => {
     .catch(error => console.error(error));
 }
 
-// update number of items chosen
-
-// add subtotal of items
+// update number of items chosen - need to update with different quantities of ingredients.
 
 // add total cost including delivery costs
 
