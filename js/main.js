@@ -9,6 +9,8 @@ const subtotalContainer = document.querySelector('.subtotal__cost');
 const deliveryCost = document.querySelector('.delivery__costs__cost');
 const totalContainer = document.querySelector('.total__cost');
 const purchaseButton = document.querySelector('.btn__purchase');
+const selectAllButton = document.querySelector('.btn__select-all');
+const deselectAllButton = document.querySelector('.btn__deselect-all');
 
 let recipeData;
 let subtotal = 0;
@@ -33,8 +35,8 @@ const findCost = ingredient => {
   return price;
 }
 
-const findParent = event => {
-  const parent = event.currentTarget.parentElement;
+const findParent = element => {
+  const parent = element.parentElement;
   return parent;
 };
 
@@ -45,7 +47,7 @@ const findIngredient = parent => {
 };
 
 const updateCost = (event, quantity) => {
-  const parent = findParent(event);
+  const parent = findParent(event.currentTarget);
   const ingredient = findIngredient(parent);
   const cost = findCost(ingredient);
   const costText = parent.querySelector('.ingredient__cost');
@@ -57,33 +59,42 @@ const updateCost = (event, quantity) => {
 };
 
 const updateSubtotal = (cost, checked) => {
-  if (checked === true) {
+  if (checked === true && subtotal > cost) {
     subtotal += cost;
-  } else {
+  } else if (subtotal > cost){
     subtotal -= cost;
   }
   subtotalContainer.innerHTML = `${subtotal.toFixed(2)}€`;
   return subtotal.toFixed(2);
 };
 
-const updateTotal = (cost, checked) => {
-  if (checked === true) {
-    total += cost;
-  } else {
-    total -= cost;
-  }
-  const newTotal = parseFloat(total.toFixed(2)) + 7;
-  totalContainer.innerHTML = `${newTotal.toFixed(2)}€`;
-  showTotal(newTotal.toFixed(2));
-  return total.toFixed(2);
-};
-
 const showTotal = total => {
   purchaseButton.innerHTML = `Buy ingredients now: ${total}€`
 };
 
+const updateTotal = (cost, checked) => {
+  if (checked === true) {
+    total += cost;
+  } else if (total >= cost) {
+    total -= cost;
+  }
+  let fixedTotal = total.toFixed(2);
+  if (totalItems !== 0){
+    console.log(fixedTotal);
+    const newTotal = parseFloat(fixedTotal) + 7;
+    totalContainer.innerHTML = `${newTotal.toFixed(2)}€`;
+    showTotal(newTotal.toFixed(2));
+    return fixedTotal;
+  } else {
+    const newTotal = parseFloat(fixedTotal);
+    totalContainer.innerHTML = `${newTotal.toFixed(2)}€`;
+    showTotal(newTotal.toFixed(2));
+    return fixedTotal;
+  }
+};
+
 const updateChosenNumber = (newNumber, checked) => {
-  if (checked ===true) {
+  if (checked === true) {
     totalItems += newNumber;
     chosenNumber.innerHTML = `Items: ${totalItems}`;
   } else {
@@ -92,27 +103,31 @@ const updateChosenNumber = (newNumber, checked) => {
   }
 };
 
-const handleCheckbox = event => {
-  const checked = event.currentTarget.checked;
-  const parent = findParent(event);
+const updateAll = (element, checked) => {
+  const parent = findParent(element);
   const ingredient = findIngredient(parent);
   const numberOfItem = parent.querySelector('.ingredient__quantity');
   const intOfItem = parseInt(numberOfItem.value);
   const costOfItem = parent.querySelector('.ingredient__cost');
   const intCostOfItem = parseFloat(costOfItem.innerHTML);
+  const key = chosenItems.findIndex(item => item.product === ingredient[0].product);
 
   if (checked === true){
     const newIngredient = {...ingredient[0], number: intOfItem};
     chosenItems.push(newIngredient);
     updateChosenNumber(newIngredient.number, checked);
-  } else {
-    const key = chosenItems.findIndex(item => item.product === ingredient[0].product);
+  } else if (key >= 0) {
     const removedItem = chosenItems.splice(key, 1);
     updateChosenNumber(removedItem[0].number, checked);
   }
   updateSubtotal(intCostOfItem, checked);
   updateTotal(intCostOfItem, checked);
   return chosenItems;
+};
+
+const handleCheckbox = event => {
+  const checked = event.currentTarget.checked;
+  updateAll(event.currentTarget, checked);
 };
 
 const printIngredients = data => {
@@ -176,7 +191,6 @@ const fetchData = () => {
     .then(res => res.json())
     .then(data => {
       recipeData = data.recipe;
-      console.log(recipeData);
       printTitle(data.recipe);
       printIngredients(data.recipe);
       return data;
@@ -184,14 +198,32 @@ const fetchData = () => {
     .catch(error => console.error(error));
 }
 
-// update number of items chosen - need to update with different quantities of ingredients.
 
-// select / deselect all buttons update checkboxes/chosen items
+const toggleAll = event => {
+  const allCheckboxes = document.querySelectorAll('.ingredient__select');
+  const target = event.currentTarget;
+  if (target.id === 'select') {
+    for (const checkbox of allCheckboxes){
+      checkbox.checked = true;
+    }
+  } else {
+    for (const checkbox of allCheckboxes){
+      checkbox.checked = false;
+    }
+  }
+  for (const checkbox of allCheckboxes){
+    updateAll(checkbox, checkbox.checked);
+  }
+}
 
+const addListeners = () => {
+  selectAllButton.addEventListener('click', toggleAll);
+  deselectAllButton.addEventListener('click', toggleAll);
+};
 
-// call functions and add listeners
 const init = () => {
   fetchData();
+  addListeners();
 }
 
 window.onload = init;
