@@ -3,6 +3,9 @@
 // elements to use
 const title = document.querySelector('.header__title');
 const list = document.querySelector('.ingredients__list');
+const ingredientCost = document.querySelector('.ingredient__cost');
+let recipeData;
+
 // btn__select-all
 // btn__select-none
 // ingredients__list__item
@@ -22,12 +25,35 @@ const list = document.querySelector('.ingredients__list');
 
 const ENDPOINT = 'https://raw.githubusercontent.com/Adalab/recipes-data/master/rissoto-setas.json';
 
-// show title
 const printTitle = data => {
   title.innerHTML = data.name;
 };
 
-// print list of items
+const updateQuantity = event => {
+  const quantity = event.currentTarget.value;
+  updateCost(event, quantity);
+  return quantity;
+};
+
+const findCost = (event) => {
+  const parent = event.currentTarget.parentElement;
+  const ingredient = parent.querySelector('.ingredient__name');
+  const currentIngredient = recipeData.ingredients.filter(item => item.product === ingredient.innerHTML);
+  const price = currentIngredient[0].price;
+  return price;
+}
+
+const updateCost = (event, quantity) => {
+  const cost = findCost(event);
+  const parent = event.currentTarget.parentElement;
+  const costText = parent.querySelector('.ingredient__cost');
+
+  if (quantity > 0){
+    const totalCost = (cost * quantity).toFixed(2);
+    costText.innerHTML = `${totalCost} €`;
+  }
+};
+
 const printIngredients = data => {
   Object.values(data.ingredients).map(item => {
       const newItem = document.createElement('li');
@@ -42,6 +68,7 @@ const printIngredients = data => {
       newNumberInput.classList.add('ingredient__quantity');
       newNumberInput.type = "text";
       newNumberInput.value = 1;
+      newNumberInput.addEventListener('input', updateQuantity);
 
       const newContainer = document.createElement('div');
       newContainer.classList.add('ingredient__info');
@@ -86,16 +113,14 @@ const fetchData = () => {
   fetch(ENDPOINT)
     .then(res => res.json())
     .then(data => {
-      console.log(data);
+      recipeData = data.recipe;
+      console.log(recipeData);
       printTitle(data.recipe);
       printIngredients(data.recipe);
       return data;
     })
     .catch(error => console.error(error));
 }
-
-
-// define what to print for each list item
 
 // take input from each item amount and update cost
 
