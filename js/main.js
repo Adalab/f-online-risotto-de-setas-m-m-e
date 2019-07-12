@@ -8,6 +8,7 @@ const chosenNumber = document.querySelector('.chosen__number');
 const subtotalContainer = document.querySelector('.subtotal__cost');
 const deliveryCost = document.querySelector('.delivery__costs__cost');
 const totalContainer = document.querySelector('.total__cost');
+const purchaseButton = document.querySelector('.btn__purchase');
 
 let recipeData;
 let subtotal = 0;
@@ -61,7 +62,7 @@ const updateSubtotal = (cost, checked) => {
   } else {
     subtotal -= cost;
   }
-  subtotalContainer.innerHTML = `${subtotal.toFixed(2)} €`;
+  subtotalContainer.innerHTML = `${subtotal.toFixed(2)}€`;
   return subtotal.toFixed(2);
 };
 
@@ -72,8 +73,13 @@ const updateTotal = (cost, checked) => {
     total -= cost;
   }
   const newTotal = parseFloat(total.toFixed(2)) + 7;
-  totalContainer.innerHTML = `${newTotal.toFixed(2)} €`;
+  totalContainer.innerHTML = `${newTotal.toFixed(2)}€`;
+  showTotal(newTotal.toFixed(2));
   return total.toFixed(2);
+};
+
+const showTotal = total => {
+  purchaseButton.innerHTML = `Buy ingredients now: ${total}€`
 };
 
 const updateChosenNumber = (newNumber, checked) => {
@@ -179,10 +185,6 @@ const fetchData = () => {
 }
 
 // update number of items chosen - need to update with different quantities of ingredients.
-
-// add total cost including delivery costs
-
-// show total price on purchase button
 
 // select / deselect all buttons update checkboxes/chosen items
 
