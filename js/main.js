@@ -4,24 +4,13 @@
 const title = document.querySelector('.header__title');
 const list = document.querySelector('.ingredients__list');
 const ingredientCost = document.querySelector('.ingredient__cost');
-let recipeData;
+const chosenNumber = document.querySelector('.chosen__number');
 
-// btn__select-all
-// btn__select-none
-// ingredients__list__item
-// ingredient__info
-// ingredient__name
-// ingredient__brand
-// ingredient__weight
-// ingredient__cost
-// chosen__number
-// subtotal__text
-// subtotal__cost
-// delivery__costs__text
-// delivery__costs__cost
-// total__text
-// total__cost
-// btn__purchase
+let recipeData;
+let subtotal = 0;
+let total = 0;
+let chosenItems = [];
+let totalItems = 0;
 
 const ENDPOINT = 'https://raw.githubusercontent.com/Adalab/recipes-data/master/rissoto-setas.json';
 
@@ -35,23 +24,50 @@ const updateQuantity = event => {
   return quantity;
 };
 
-const findCost = (event) => {
-  const parent = event.currentTarget.parentElement;
-  const ingredient = parent.querySelector('.ingredient__name');
-  const currentIngredient = recipeData.ingredients.filter(item => item.product === ingredient.innerHTML);
-  const price = currentIngredient[0].price;
+const findCost = ingredient => {
+  const price = ingredient[0].price;
   return price;
 }
 
-const updateCost = (event, quantity) => {
-  const cost = findCost(event);
+const findParent = event => {
   const parent = event.currentTarget.parentElement;
+  return parent;
+};
+
+const findIngredient = parent => {
+  const ingredient = parent.querySelector('.ingredient__name');
+  const currentIngredient = recipeData.ingredients.filter(item => item.product === ingredient.innerHTML);
+  return currentIngredient;
+};
+
+const updateCost = (event, quantity) => {
+  const parent = findParent(event);
+  const ingredient = findIngredient(parent);
+  const cost = findCost(ingredient);
   const costText = parent.querySelector('.ingredient__cost');
 
   if (quantity > 0){
     const totalCost = (cost * quantity).toFixed(2);
     costText.innerHTML = `${totalCost} €`;
   }
+};
+
+const updateChosenNumber = () => {
+  chosenNumber.innerHTML = `Items: ${chosenItems.length}`;
+};
+
+const handleCheckbox = event => {
+  const checked = event.currentTarget.checked;
+  const parent = findParent(event);
+  const ingredient = findIngredient(parent);
+  if (checked === true){
+    chosenItems.push(ingredient[0]);
+  } else {
+    const key = chosenItems.findIndex(item => item.product === ingredient[0].product);
+    chosenItems.splice(key, 1);
+  }
+  updateChosenNumber();
+  return chosenItems;
 };
 
 const printIngredients = data => {
@@ -63,6 +79,7 @@ const printIngredients = data => {
       const newCheckbox = document.createElement('input');
       newCheckbox.classList.add('ingredient__select');
       newCheckbox.type = "checkbox";
+      newCheckbox.addEventListener('click', handleCheckbox);
 
       const newNumberInput = document.createElement('input');
       newNumberInput.classList.add('ingredient__quantity');
@@ -121,8 +138,6 @@ const fetchData = () => {
     })
     .catch(error => console.error(error));
 }
-
-// take input from each item amount and update cost
 
 // update number of items chosen
 
